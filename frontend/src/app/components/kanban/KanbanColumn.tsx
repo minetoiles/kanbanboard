@@ -1,9 +1,5 @@
 import { KanbanCard } from "./KanbanCard";
 import type { CardData, Status } from "../../types";
-import { VALIDATION } from "../../constants";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const DONE_PAGE_SIZE = VALIDATION.DONE_PAGE_SIZE;
 
 interface Props {
   title: string;
@@ -14,12 +10,8 @@ interface Props {
   onEdit: (card: CardData) => void;
   onDelete: (id: string) => void;
   onMove: (id: string, status: Status) => void;
-  page?: number;
-  totalPages?: number;
-  onPageChange?: (page: number) => void;
+  isLoading?: boolean;
 }
-
-export { DONE_PAGE_SIZE };
 
 export function KanbanColumn({
   title,
@@ -30,17 +22,15 @@ export function KanbanColumn({
   onEdit,
   onDelete,
   onMove,
-  page,
-  totalPages,
-  onPageChange,
+  isLoading = false,
 }: Props) {
   return (
     <div
-      className="flex flex-col rounded-2xl border min-w-0"
+      className="flex flex-col rounded-2xl border min-w-0 overflow-hidden"
       style={{
         background: "var(--card)",
         borderColor: "var(--border)",
-        minHeight: "calc(100vh - 200px)",
+        height: "100%",
       }}
     >
       {/* Column header */}
@@ -58,8 +48,29 @@ export function KanbanColumn({
       </div>
 
       {/* Cards */}
-      <div className="flex-1 p-3 flex flex-col gap-2.5 overflow-y-auto">
-        {cards.length === 0 ? (
+      <div className="flex-1 p-3 flex flex-col gap-2.5 overflow-y-auto scrollbar-hide" style={{ minHeight: 0 }}>
+        {isLoading ? (
+          <>
+            {[1, 2, 3].map((index) => (
+              <div
+                key={index}
+                className="rounded-xl border p-4 animate-pulse"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <div className="h-4 w-24 mb-3 rounded-full bg-slate-700/30" />
+                <div className="h-3 w-full mb-2 rounded-full bg-slate-700/20" />
+                <div className="h-3 w-5/6 mb-3 rounded-full bg-slate-700/20" />
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="h-8 w-8 rounded-full bg-slate-700/30" />
+                  <div className="h-3 w-20 rounded-full bg-slate-700/20" />
+                </div>
+              </div>
+            ))}
+          </>
+        ) : cards.length === 0 ? (
           <div
             className="flex items-center justify-center h-24 rounded-xl border-2 border-dashed text-sm"
             style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}
@@ -73,33 +84,6 @@ export function KanbanColumn({
         )}
       </div>
 
-      {/* Pagination for done column */}
-      {status === "done" && totalPages !== undefined && totalPages > 1 && page !== undefined && onPageChange && (
-        <div
-          className="flex items-center justify-between px-4 py-3 border-t"
-          style={{ borderColor: "var(--border)" }}
-        >
-          <button
-            className="p-1.5 rounded-lg transition-colors disabled:opacity-30 hover:bg-accent"
-            style={{ color: "var(--muted-foreground)" }}
-            disabled={page === 0}
-            onClick={() => onPageChange(page - 1)}
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-            {page + 1} / {totalPages}
-          </span>
-          <button
-            className="p-1.5 rounded-lg transition-colors disabled:opacity-30 hover:bg-accent"
-            style={{ color: "var(--muted-foreground)" }}
-            disabled={page === totalPages - 1}
-            onClick={() => onPageChange(page + 1)}
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }
