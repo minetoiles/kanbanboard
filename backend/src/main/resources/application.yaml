@@ -1,4 +1,7 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+
   application:
     name: kanbanboard_BE
 
@@ -23,3 +26,4 @@ jwt:
     secretKey: ${JWT_SECRET_KEY}
     expiration:
       access: 1800000
+
